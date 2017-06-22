@@ -1,0 +1,77 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Text;
+
+using ClientWebService;
+using BikeBook.Views.CustomUIElements;
+using Xamarin.Forms;
+
+namespace BikeBook.Views
+{
+    public class BuySellListAds : ContentPage
+    {
+        private Ads m_retreivedAds;
+        
+        private GeneralPageTemplate m_mainTemplate;
+        private TableView m_adTable;
+        private TableSection m_adListing;
+
+        public BuySellListAds()
+        {
+            Device.BeginInvokeOnMainThread(() =>
+            {
+                GuiLayout();
+                PopulateContent();
+            });
+        }
+
+        private void GuiLayout()
+        {
+            m_adListing = new TableSection();
+
+            m_adTable = new TableView
+            {
+                Intent = TableIntent.Menu,
+                HasUnevenRows = true,
+                HorizontalOptions = LayoutOptions.FillAndExpand,
+                VerticalOptions = LayoutOptions.Fill,
+                Root = new TableRoot
+                {
+                    m_adListing,
+                },
+            };
+
+            m_mainTemplate = new GeneralPageTemplate()
+            {
+                Content = m_adTable,
+            };
+
+            Content = m_mainTemplate;
+        }
+
+        private void PopulateContent()
+        {
+            Service webService = Service.Instance;
+            m_retreivedAds = webService.GetAds(webService.Email);
+            foreach (Ad ad in m_retreivedAds.ad)
+            {
+                ViewCell newMessage = new ViewCell()
+                {
+                    View = new BuySellCell(ad)
+                };
+                newMessage.Tapped += NavigateToAd;
+                m_adListing.Add(newMessage);
+            };
+        }
+
+        private void NavigateToAd(object sender, EventArgs e)
+        {
+            ViewCell TappedCell = (ViewCell)sender;
+            BuySellCell TappedBuySellCell = (BuySellCell)TappedCell.View;
+            Ad TappedAd = TappedBuySellCell.Ad;
+            Navigation.PushAsync(new BuySellViewAd(TappedAd));
+        }
+    }
+}

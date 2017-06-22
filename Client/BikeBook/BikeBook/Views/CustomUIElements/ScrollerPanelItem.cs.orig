@@ -1,0 +1,129 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection.Emit;
+using System.Text;
+using ClientWebService;
+using Xamarin.Forms;
+
+namespace BikeBook.Views.CustomUIElements
+{
+
+
+    /**
+     * A layout containing an image with a colored box below containing a title and subtitle
+     */
+    public class ScrollerPanelItem : ContentView
+    {
+        private RelativeLayout m_mainLayout;
+        private Image m_mainImage;
+        private BoxView m_baseBox;
+        private Label m_mainTitle;
+        private Label m_subTitle;
+
+        public string Title
+        {
+            set { m_mainTitle.Text = value; }
+            get { return m_mainTitle.Text; }
+        }
+
+        public string Subtitle
+        {
+            set { m_subTitle.Text = value; }
+            get { return m_subTitle.Text;  }
+        }
+
+        public string ImageSource
+        {
+            set { m_mainImage.Source = value; }
+        }
+
+
+        /**
+         * Class Constructor
+         */
+        public ScrollerPanelItem()
+        {
+            GuiLayout();
+        }
+
+        /**
+         * Class Constructor
+         */
+        public static ScrollerPanelItem FromUserProfile(User user)
+        {
+            ScrollerPanelItem newPanel = new ScrollerPanelItem();
+            newPanel.Title = user.name;
+<<<<<<< Updated upstream
+            newPanel.ImageSource = UIImages.BIKEPLACEHOLDER;
+=======
+            newPanel.ImageSource = UIConstants.EmbeddedImageName(UIConstants.EmbeddedImages.BikePlaceHolder);
+>>>>>>> Stashed changes
+
+            return newPanel;
+        }
+
+
+        /**
+         * Lays out widget's UI
+         */
+        private void GuiLayout()
+        {
+            RelativeLayoutConstraintBuilder constraintBuilder = new RelativeLayoutConstraintBuilder();
+            m_mainLayout = new RelativeLayout();
+            m_mainImage = new Image()
+            {
+                Aspect = Aspect.AspectFill,
+            };
+            m_baseBox = new BoxView()
+            {
+                BackgroundColor = Color.FromHex(UIColors.COLOR_DEFAULT_BUTTON_BACKGROUND),
+            };
+            m_mainTitle = new Label()
+            {
+                TextColor = Color.FromHex(UIColors.COLOR_PRIMARY_TEXT),
+                FontSize = Device.GetNamedSize(NamedSize.Small, typeof(Label)),
+                LineBreakMode = LineBreakMode.TailTruncation,
+            };
+            m_subTitle = new Label()
+            {
+                TextColor = Color.FromHex(UIColors.COLOR_PRIMARY_TEXT),
+                FontSize = Device.GetNamedSize(NamedSize.Micro, typeof(Label)),
+                LineBreakMode = LineBreakMode.TailTruncation,
+            };
+
+            Constraint HorizCenter = Constraint.RelativeToParent((parent) => { return (parent.WidthRequest / 2) - (m_mainImage.WidthRequest / 2); });
+            m_mainLayout.Children.Add(m_mainImage,
+                HorizCenter,
+                null,
+                constraintBuilder.ParentWidth(),
+                constraintBuilder.ParentHeightPercent(0.7));
+
+            m_mainLayout.Children.Add(m_baseBox,
+                null,
+                constraintBuilder.ParentHeightPercent(0.7),
+                constraintBuilder.ParentWidth(),
+                constraintBuilder.ParentHeightPercent(0.3));
+
+            Constraint BoxLeftEdge = Constraint.RelativeToView(m_baseBox, (Parent, sibling) => { return sibling.X + 4; });
+            Constraint BoxUpperThird = Constraint.RelativeToView(m_baseBox, (Parent, sibling) => { return sibling.Y + (sibling.Height * 0.1) - (m_mainTitle.Height / 2); });
+            m_mainLayout.Children.Add(m_mainTitle,
+                BoxLeftEdge,
+                BoxUpperThird,
+                constraintBuilder.ParentWidthPercent(0.90),
+                null);
+
+
+            Constraint BoxLowerThird = Constraint.RelativeToView(m_baseBox, (Parent, sibling) => { return sibling.Y + (sibling.Height * 0.5) - (m_subTitle.Height / 2); });
+            m_mainLayout.Children.Add(m_subTitle,
+                BoxLeftEdge,
+                BoxLowerThird,
+                constraintBuilder.ParentWidthPercent(0.90),
+                null);
+
+            WidthRequest = 100;
+            HeightRequest = 120;
+            Content = m_mainLayout;
+        }
+    }
+}
